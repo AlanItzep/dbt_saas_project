@@ -1,6 +1,8 @@
 # SaaS Analytics Warehouse — DBT Portfolio Project
 
-A production-ready **data warehouse** for a fictional SaaS company, built with **DBT Core** and **DuckDB**. This project demonstrates end-to-end data engineering skills: raw data ingestion, layered transformations, testing, and documentation.
+A production-ready **data warehouse** for a fictional SaaS company, built with **DBT** and **DuckDB**. This project demonstrates end-to-end data engineering skills: raw data ingestion, layered transformations, testing, and documentation.
+
+**Perfect for:** Data engineering portfolios, freelance projects, interview prep
 
 ## 📊 Project Overview
 
@@ -12,29 +14,37 @@ This project builds an analytics warehouse that answers key business questions:
 
 ## 🏗️ Architecture
 
+**Data Lineage Diagram:**
+
 ```
-Raw CSV Data → DuckDB → DBT Transformations → Analytics Tables
-     ↓              ↓           ↓                    ↓
-  customers    raw_*         stg_*          mart_revenue
-  subscriptions   tables    staging         mart_engagement
-  events                    models          (Business-ready)
+Raw Sources → Staging Models → Mart Models
+   (CSV)      (Cleaning)      (Analytics-Ready)
+
+raw_customers      →  stg_customers      ↘
+raw_subscriptions  →  stg_subscriptions  → mart_revenue_metrics
+raw_events         →  stg_events         ↗ mart_customer_engagement
 ```
+
+![DBT Lineage Diagram](assets/lineage_diagram.png)
 
 **Data Flow Layers:**
 
-1. **Raw Layer** (`raw_*` tables)
-   - Loaded directly from CSV files by `seeds/load_data.py`
-   - No transformation, no validation yet
+1. **Raw Layer** (`raw_*` tables in `raw` schema)
+   - Loaded directly from CSV files via `seeds/load_data.py`
+   - No transformation — one-to-one copy from CSV
+   - Located in `raw` schema
 
-2. **Staging Layer** (`stg_*` views)
-   - Data cleaning: null handling, type casting
-   - Column standardization and renaming
-   - Basic validation (not null, unique checks)
+2. **Staging Layer** (`stg_*` views in `raw_staging` schema)
+   - **Data cleaning:** Remove nulls, cast types
+   - **Standardization:** Rename columns, normalize formats
+   - **Validation:** Basic constraints (not null, unique)
+   - Materialized as **views** for efficiency
 
-3. **Mart Layer** (`mart_*` tables)
-   - Business logic implementation
-   - Joins and aggregations
-   - Analytics-ready tables for BI tools
+3. **Mart Layer** (`mart_*` tables in `raw_marts` schema)
+   - **Business logic:** Join tables, aggregate metrics
+   - **Key metrics:** MRR, ARR, churn, engagement
+   - **Ready for BI:** Optimized for dashboards and reports
+   - Materialized as **tables** for performance
 
 ## 🚀 Quick Start
 
