@@ -1,6 +1,8 @@
 # SaaS Analytics Warehouse — DBT Portfolio Project
 
-A production-ready **data warehouse** for a fictional SaaS company, built with **DBT Core** and **DuckDB**. This project demonstrates end-to-end data engineering skills: raw data ingestion, layered transformations, testing, and documentation.
+A production-ready **data warehouse** for a fictional SaaS company, built with **DBT** and **DuckDB**. This project demonstrates end-to-end data engineering skills: raw data ingestion, layered transformations, testing, and documentation.
+
+**Perfect for:** Data engineering portfolios, freelance projects, interview prep
 
 ## 📊 Project Overview
 
@@ -12,66 +14,84 @@ This project builds an analytics warehouse that answers key business questions:
 
 ## 🏗️ Architecture
 
+**Data Lineage Diagram:**
+
 ```
-Raw CSV Data → DuckDB → DBT Transformations → Analytics Tables
-     ↓              ↓           ↓                    ↓
-  customers    raw_*         stg_*          mart_revenue
-  subscriptions   tables    staging         mart_engagement
-  events                    models          (Business-ready)
+Raw Sources → Staging Models → Mart Models
+   (CSV)      (Cleaning)      (Analytics-Ready)
+
+raw_customers      →  stg_customers      ↘
+raw_subscriptions  →  stg_subscriptions  → mart_revenue_metrics
+raw_events         →  stg_events         ↗ mart_customer_engagement
 ```
+
+![DBT Lineage Diagram](assets/lineage_diagram.png)
 
 **Data Flow Layers:**
 
-1. **Raw Layer** (`raw_*` tables)
-   - Loaded directly from CSV files by `seeds/load_data.py`
-   - No transformation, no validation yet
+1. **Raw Layer** (`raw_*` tables in `raw` schema)
+   - Loaded directly from CSV files via `seeds/load_data.py`
+   - No transformation — one-to-one copy from CSV
+   - Located in `raw` schema
 
-2. **Staging Layer** (`stg_*` views)
-   - Data cleaning: null handling, type casting
-   - Column standardization and renaming
-   - Basic validation (not null, unique checks)
+2. **Staging Layer** (`stg_*` views in `raw_staging` schema)
+   - **Data cleaning:** Remove nulls, cast types
+   - **Standardization:** Rename columns, normalize formats
+   - **Validation:** Basic constraints (not null, unique)
+   - Materialized as **views** for efficiency
 
-3. **Mart Layer** (`mart_*` tables)
-   - Business logic implementation
-   - Joins and aggregations
-   - Analytics-ready tables for BI tools
+3. **Mart Layer** (`mart_*` tables in `raw_marts` schema)
+   - **Business logic:** Join tables, aggregate metrics
+   - **Key metrics:** MRR, ARR, churn, engagement
+   - **Ready for BI:** Optimized for dashboards and reports
+   - Materialized as **tables** for performance
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+- **Python 3.12+** (tested with Python 3.13)
+- **DBT** (already installed, or install: `pip install dbt-duckdb`)
+- **DuckDB** (will be installed via pip)
+
 ```bash
-# Python 3.8+
+# Check Python version
 python --version
 
-# Install DuckDB and DBT
-pip install duckdb dbt-duckdb pandas
+# Install dependencies
+pip install duckdb
 ```
 
-### Setup (5 minutes)
+### Setup (10 minutes)
 
 1. **Clone this repo:**
 ```bash
-git clone https://github.com/AlanItzep/dbt_fundamentals.git
-cd dbt_fundamentals
+git clone https://github.com/AlanItzep/dbt_saas_project.git
+cd dbt_saas_project
 ```
 
-2. **Load sample data into DuckDB:**
+2. **Install dependencies:**
+```bash
+pip install duckdb
+```
+
+3. **Load sample data into DuckDB:**
 ```bash
 python seeds/load_data.py
 ```
-Output: `saas_analytics.duckdb` (SQLite-like database)
+Output: Creates `saas_analytics.duckdb` with raw tables
 
-3. **Configure DBT profiles:**
+4. **Configure DBT profiles:**
 ```bash
-# Copy profiles to DBT config directory
+# Option A: Copy profiles to DBT config directory
 mkdir -p ~/.dbt
 cp profiles.yml ~/.dbt/profiles.yml
 
-# Or set environment variable
+# Option B: Set environment variable
 export DBT_PROFILES_DIR=$(pwd)
 ```
 
-4. **Run transformations:**
+5. **Run transformations:**
 ```bash
 # Install DBT dependencies
 dbt deps
@@ -85,18 +105,27 @@ dbt test
 
 Expected output:
 ```
-Running with dbt 1.5.0
-Found 5 models, 8 tests
-Executing... [=====] 100% Done. 5 created in 2.35s.
-Executed 8 tests, all passed.
+dbt-fusion 2.0.0
+Processed: 5 models | 18 tests
+Summary: 23 total | 23 success
 ```
 
-5. **Generate documentation:**
+6. **View results:**
+
+**Option A: Query with Python**
 ```bash
-dbt docs generate
-dbt docs serve
+python view_data.py
 ```
-Visit `http://localhost:8000` to explore data lineage and column-level documentation.
+
+**Option B: Browse in DBeaver** (recommended)
+- Download: https://dbeaver.io
+- New Connection → DuckDB → Point to `saas_analytics.duckdb`
+- Browse tables in left panel
+
+**Option C: View catalog metadata**
+```bash
+python view_catalog.py
+```
 
 ## 📁 Project Structure
 
@@ -189,13 +218,14 @@ dbt test
 
 ## 🔧 Technology Stack
 
-| Component | Technology |
-|-----------|------------|
-| **Data Warehouse** | DuckDB (local, fast, SQL-based) |
-| **Transformation** | DBT Core (open-source) |
-| **Language** | SQL + Jinja2 templating |
-| **Data Ingestion** | Python (Pandas + DuckDB) |
-| **Version Control** | Git |
+| Component | Technology | Version |
+|-----------|------------|---------|
+| **Data Warehouse** | DuckDB | 0.8+ |
+| **Transformation** | DBT (Core or Fusion) | 1.5+ / 2.0+ |
+| **Language** | SQL + Jinja2 | - |
+| **Data Ingestion** | Python + DuckDB | Python 3.12+ |
+| **Database Browser** | DBeaver (optional) | Latest |
+| **Version Control** | Git | Latest |
 
 ## 📈 Scaling This Project
 
@@ -244,16 +274,58 @@ saas_analytics:
 3. **Add custom marts** for your use case
 4. **Deploy to Snowflake/BigQuery** with your real data
 
+## 🔧 Troubleshooting
+
+**Issue: "Table does not exist"**
+```bash
+# Make sure you ran the seed script first
+python seeds/load_data.py
+
+# Then run DBT
+dbt run
+```
+
+**Issue: "Schema raw does not exist"**
+- The seed script creates the `raw` schema automatically
+- If error persists, delete `saas_analytics.duckdb` and re-run `python seeds/load_data.py`
+
+**Issue: dbt test fails**
+```bash
+# Check your data is loaded
+dbt run --select stg_customers
+dbt test
+```
+
+**Issue: Pandas installation fails (Python 3.13)**
+- Use minimal requirements: `pip install duckdb` only
+- Pandas is optional for this project
+
+**Issue: DBeaver won't open**
+- Run as Administrator
+- Or use the Python scripts instead (`python view_data.py`)
+
 ## 📝 Notes
 
-- All sample data is **completely fictional**
-- Safe to share publicly on GitHub
-- Database file is not version controlled (`.gitignore`)
-- Models are DuckDB-compatible and database-agnostic
+- All sample data is **completely fictional** — safe to share publicly
+- Database file (`*.duckdb`) is git-ignored — not committed to GitHub
+- Models are database-agnostic (work with Snowflake, BigQuery, PostgreSQL with minor changes)
+- Catalog and manifest files (`target/`) show full data warehouse documentation
+
+## 📚 Git Branching
+
+This repo uses:
+- **`main`** — Production-ready portfolio code
+- **`develop`** — Development/experimental branch
+
+Clone and work on `develop`, then merge to `main` when stable.
 
 ## 📧 Contact
 
 Built by Alan Itzep | [LinkedIn](https://www.linkedin.com/in/alan-itzep/) | [GitHub](https://github.com/AlanItzep)
+
+---
+
+**Questions or improvements?** Feel free to open an issue or pull request!
 
 ---
 
