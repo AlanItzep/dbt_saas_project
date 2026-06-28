@@ -1,0 +1,8 @@
+# DBT and DuckDB for SaaS Analytics Project
+dbt-duckdb==1.5.2
+dbt-core==1.5.2
+duckdb==0.8.1
+pandas==2.0.3
+
+# Optional: for advanced data processing
+numpy==1.24.3
