@@ -1,0 +1,21 @@
+customer_id,customer_name,company_name,email,country,signup_date,contract_value_usd
+C001,Alice Johnson,Tech Startup Inc,alice@techstartup.com,USA,2023-01-15,5000
+C002,Bob Smith,Digital Solutions LLC,bob@digitalsolutions.com,Canada,2023-02-20,8500
+C003,Carol Davis,Cloud First Corp,carol@cloudfirst.com,USA,2023-03-10,12000
+C004,David Wilson,Innovation Labs,david@innovationlabs.com,UK,2023-04-05,6500
+C005,Emma Brown,Data Systems Ltd,emma@datasystems.com,Germany,2023-05-12,9000
+C006,Frank Miller,Enterprise Tech,frank@enterprisetech.com,USA,2023-06-18,15000
+C007,Grace Lee,Growth Analytics,grace@growthanalytics.com,Australia,2023-07-22,7500
+C008,Henry Davis,Strategic Partners,henry@strategicpartners.com,USA,2023-08-30,11000
+C009,Iris Martinez,Digital Transformation,iris@digitaltransform.com,Spain,2023-09-14,5500
+C010,Jack Taylor,Cloud Ops Inc,jack@cloudops.com,Canada,2023-10-25,8000
+C011,Karen White,SaaS Solutions,karen@saafsolutions.com,USA,2023-11-08,13500
+C012,Leo Chen,Tech Ventures,leo@techventures.com,Singapore,2023-12-20,10000
+C013,Maya Patel,Smart Analytics,maya@smartanalytics.com,India,2024-01-15,4500
+C014,Nathan Black,Data Warehouse Co,nathan@datawarehouse.com,USA,2024-02-28,9500
+C015,Olivia Green,Insight Systems,olivia@insightsystems.com,Netherlands,2024-03-12,7000
+C016,Peter Johnson,Integration Hub,peter@integrationhub.com,USA,2024-04-20,11500
+C017,Quinn Roberts,Analytics Pro,quinn@analyticspro.com,Canada,2024-05-30,6500
+C018,Rachel Adams,Digital Metrics,rachel@digitalmetrics.com,USA,2024-06-15,8500
+C019,Samuel Scott,Cloud Native,samuel@cloudnative.com,Germany,2024-07-22,10500
+C020,Tina Murphy,Platform Services,tina@platformservices.com,USA,2024-08-18,12500

@@ -1,0 +1,145 @@
+version: 2
+
+# Raw data sources (loaded by load_data.py)
+sources:
+  - name: raw
+    description: Raw data tables loaded from CSV files
+    tables:
+      - name: raw_customers
+        description: Raw customer master data
+        columns:
+          - name: customer_id
+            description: Unique customer identifier
+            tests:
+              - unique
+              - not_null
+
+      - name: raw_subscriptions
+        description: Raw subscription records
+        columns:
+          - name: subscription_id
+            description: Unique subscription identifier
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: Foreign key to customer
+
+      - name: raw_events
+        description: Raw user activity events
+        columns:
+          - name: event_id
+            description: Unique event identifier
+            tests:
+              - unique
+              - not_null
+
+# Staging models
+models:
+  - name: stg_customers
+    description: Cleaned and standardized customer data
+    columns:
+      - name: customer_id
+        description: Unique customer identifier
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: Full name of customer contact
+      - name: company_name
+        description: Company/organization name
+      - name: email
+        description: Primary contact email
+        tests:
+          - not_null
+      - name: country
+        description: Customer country of operation
+      - name: signup_date
+        description: Date customer signed up
+      - name: contract_value_usd
+        description: Annual contract value in USD
+
+  - name: stg_subscriptions
+    description: Cleaned subscription data with derived fields
+    columns:
+      - name: subscription_id
+        description: Unique subscription identifier
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Foreign key to customer
+        tests:
+          - not_null
+      - name: subscription_plan
+        description: Name of subscription plan
+      - name: plan_tier
+        description: Tier classification (Starter, Growth, Enterprise)
+      - name: monthly_fee_usd
+        description: Monthly recurring fee in USD
+      - name: annual_value_usd
+        description: Annualized subscription value
+      - name: is_active
+        description: Whether subscription is currently active
+
+  - name: stg_events
+    description: Cleaned user activity event data
+    columns:
+      - name: event_id
+        description: Unique event identifier
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Customer associated with event
+      - name: event_type
+        description: Type of activity (login, export_report, api_call, etc.)
+      - name: event_date
+        description: Date of event
+      - name: feature_used
+        description: Feature name associated with event
+      - name: value_usd
+        description: Add-on revenue from event (if applicable)
+
+# Mart models
+  - name: mart_revenue_metrics
+    description: Key revenue metrics for each customer (MRR, ARR, plan tier)
+    columns:
+      - name: customer_id
+        description: Unique customer identifier
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: Customer name
+      - name: company_name
+        description: Company name
+      - name: monthly_recurring_revenue
+        description: Total MRR for customer
+      - name: annualized_revenue
+        description: Total ARR for customer
+      - name: is_active
+        description: Whether customer has active subscription
+      - name: engagement_level
+        description: Customer engagement classification
+
+  - name: mart_customer_engagement
+    description: Customer activity and feature usage metrics
+    columns:
+      - name: customer_id
+        description: Unique customer identifier
+        tests:
+          - unique
+          - not_null
+      - name: customer_name
+        description: Customer name
+      - name: login_days_last_month
+        description: Number of days with logins in last 30 days
+      - name: total_events_last_month
+        description: Total events in last 30 days
+      - name: distinct_features_used
+        description: Number of unique features used
+      - name: engagement_level
+        description: Engagement classification (Very Active, Active, Moderate, Inactive)
+      - name: last_activity_date
+        description: Most recent event date

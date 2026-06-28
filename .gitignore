@@ -39,3 +39,4 @@ profiles.yml
 # Data files with real information (if any)
 data/*.csv.bak
 data/real_*.csv
+dbt_internal_packages/
